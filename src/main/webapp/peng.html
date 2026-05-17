@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>友達グループ</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="peng.js"></script>
+<style>
+  :root {
+    --green: #07c160;
+    --green-dark: #05a652;
+    --ink: #1f2933;
+    --muted: #6b7280;
+    --line: #dfe7e2;
+    --panel: rgba(255, 255, 255, 0.92);
+    --soft: #f2fbf6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Yu Gothic", "Meiryo", "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 8%, rgba(7, 193, 96, 0.16), transparent 30%),
+      linear-gradient(135deg, #edf8f2 0%, #f8faf8 48%, #eaf7f0 100%);
+  }
+
+  .page {
+    width: min(960px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 44px;
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .nav a {
+    color: #244336;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(7, 193, 96, 0.18);
+    border-radius: 999px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 8px 22px rgba(31, 41, 51, 0.06);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .nav a:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(7, 193, 96, 0.13);
+  }
+
+  .panel {
+    width: min(640px, 100%);
+    margin: 0 auto;
+    padding: 34px;
+    background: var(--panel);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 18px;
+    box-shadow: 0 22px 60px rgba(25, 78, 51, 0.13);
+    backdrop-filter: blur(12px);
+  }
+
+  .wide { width: min(820px, 100%); }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(26px, 4vw, 36px);
+    letter-spacing: 0;
+    color: #123326;
+  }
+
+  .subtitle {
+    margin: 0 0 28px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .form {
+    display: grid;
+    gap: 18px;
+  }
+
+  label {
+    display: grid;
+    gap: 8px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  input, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    padding: 13px 14px;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.7;
+  }
+
+  input:focus, textarea:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 4px rgba(7, 193, 96, 0.12);
+  }
+
+  input[type="submit"], input[type="button"], button, .action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    border: 0;
+    border-radius: 12px;
+    padding: 0 18px;
+    background: var(--green);
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(7, 193, 96, 0.22);
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  input[type="submit"]:hover, input[type="button"]:hover, button:hover, .action-link:hover {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(7, 193, 96, 0.28);
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .result-box, #history {
+    width: 100%;
+    min-height: 220px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    overflow: auto;
+    line-height: 1.8;
+  }
+
+  #history { height: 360px; }
+
+  #res:empty::before {
+    content: "まだデータがありません";
+    color: #98a2b3;
+  }
+
+  .message-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  hr { display: none; }
+
+  @media (max-width: 640px) {
+    .page { width: min(100% - 22px, 960px); padding-top: 18px; }
+    .panel { padding: 24px 18px; border-radius: 16px; }
+    .nav { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+    .nav a { white-space: nowrap; }
+    .message-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <nav class="nav">
+  <a href="my.html">マイページ</a>
+  <a href="sh.html">友達検索</a>
+  <a href="friends.html">友達一覧</a>
+  <a href="peng.html">友達グループ</a>
+  <a href="friendgroup.html">投稿</a>
+  <a href="login.html">ログイン</a>
+</nav>
+    <section class="panel wide">
+      <h1>友達グループ</h1>
+      <p class="subtitle">友達グループの投稿を表示します。</p>
+      <div class="result-box"><span id="res"></span></div>
+    </section>
+  </main>
+</body>
+</html>
